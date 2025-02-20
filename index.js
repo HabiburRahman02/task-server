@@ -40,11 +40,13 @@ async function run() {
     })
 
     // task related apis
-    app.delete('/deleteTaskById', async (req, res) => {
-      const id = req.params;
-      console.log(id);
+    app.delete('/deleteTaskById/:id', async (req, res) => {
+      const id = req.params;;
+      const filter = { _id: new ObjectId(id) }
+      const result = await taskCollection.deleteOne(filter);
+      res.send(result)
     })
-    app.get('/getTaskById', async (req, res) => {
+    app.get('/getTaskById/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
       const result = await taskCollection.findOne(query);
@@ -61,20 +63,33 @@ async function run() {
       res.send(result);
     })
 
+    app.patch('/taskUpdateById/:id', async (req, res) => {
+      const id = req.params.id;
+      const taskInfo = req.body;
+      // console.log(id, taskInfo);
+      const filter = { _id: new ObjectId(id) }
+      const updatedDoc = {
+        $set: taskInfo
+      }
+      const options = { upsert: true }
+      const result = await taskCollection.updateOne(filter, updatedDoc, options);
+      res.send(result)
+    })
+
     app.put('/tasks/:id', async (req, res) => {
-      const taskId = req.params.id;        
-      const { category } = req.body;         
-    
+      const taskId = req.params.id;
+      const { category } = req.body;
+
       try {
         const result = await taskCollection.updateOne(
-          { _id: new ObjectId(taskId) },    
-          { $set: { category: category } }   
+          { _id: new ObjectId(taskId) },
+          { $set: { category: category } }
         );
-    
+
         if (result.matchedCount === 0) {
           return res.status(404).send({ message: "Task not found" });
         }
-    
+
         res.send({ message: "Task updated successfully", result });
       } catch (error) {
         console.error("Error updating task:", error);
