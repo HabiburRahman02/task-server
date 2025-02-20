@@ -6,7 +6,12 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 // middleware
-app.use(cors())
+app.use(cors({
+  origin: [
+    'https://task-ph.firebaseapp.com',
+    'https://task-ph.web.app'
+  ]
+}))
 app.use(express.json())
 
 
@@ -100,9 +105,9 @@ async function run() {
 
 
 
-    await client.connect();
+    // await client.connect();
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
