@@ -9,7 +9,8 @@ const port = process.env.PORT || 5000;
 app.use(cors({
   origin: [
     'https://task-ph.firebaseapp.com',
-    'https://task-ph.web.app'
+    'https://task-ph.web.app',
+    'http://localhost:5173'
   ]
 }))
 app.use(express.json())
@@ -57,8 +58,12 @@ async function run() {
       const result = await taskCollection.findOne(query);
       res.send(result)
     })
-    app.get('/tasks', async (req, res) => {
-      const result = await taskCollection.find().toArray();
+
+    app.get('/tasksByEmail', async (req, res) => {
+      const email = req.query.email;
+      // console.log('email', email);
+      const query = { email: email };
+      const result = await taskCollection.find(query).toArray();
       res.send(result);
     })
 
